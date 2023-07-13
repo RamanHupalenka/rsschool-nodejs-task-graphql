@@ -1,52 +1,117 @@
 import { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { createGqlResponseSchema, gqlResponseSchema } from './schemas.js';
 import { buildSchema, graphql } from 'graphql';
-import { PrismaClient } from '@prisma/client';
+import { MemberType, Post, PrismaClient, Profile, User } from '@prisma/client';
 import { UUIDType } from './types/uuid.js';
 import { MemberTypeIdType } from './types/memberTypeId.js';
+
+// interface ProfileCombined extends Profile {
+//   memberType: MemberType | null;
+// }
+
+// interface UserCombined extends User {
+//   posts: Post[] | null;
+//   profile: ProfileCombined | null;
+// }
+
+const combineUserRelations = async (
+  prisma: PrismaClient,
+  user: User,
+) /* : Promise<UserCombined | null> */ => {
+  const profile = await prisma.profile.findUnique({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  const memberType = profile?.memberTypeId
+    ? await prisma.memberType.findUnique({
+        where: {
+          id: profile.memberTypeId,
+        },
+      })
+    : null;
+
+  const posts = await prisma.post.findMany({
+    where: {
+      authorId: user.id,
+    },
+  });
+
+  if (profile) {
+    Object.assign(profile, { memberType });
+  }
+
+  Object.assign(user, { posts });
+  Object.assign(user, { profile });
+
+  return user;
+};
 
 const getResolvers = (prisma: PrismaClient) => ({
   UUID: UUIDType,
   MemberTypeId: MemberTypeIdType,
   memberTypes: async () => {
-    return await prisma.memberType.findMany();
+    const result = await prisma.memberType.findMany();
+
+    return result;
   },
   memberType: async ({ id }: { id: string }) => {
-    return await prisma.memberType.findUnique({
+    const result = await prisma.memberType.findUnique({
       where: {
         id,
       },
     });
+
+    return result;
   },
   posts: async () => {
-    return await prisma.post.findMany();
+    const result = await prisma.post.findMany();
+
+    return result;
   },
   post: async ({ id }: { id: string }) => {
-    return await prisma.post.findUnique({
+    const result = await prisma.post.findUnique({
       where: {
         id,
       },
     });
+
+    return result;
   },
   users: async () => {
-    return await prisma.user.findMany();
+    const users = await prisma.user.findMany();
+    const promisesList = users?.map((user) => combineUserRelations(prisma, user));
+    const results = await Promise.all(promisesList);
+
+    return results;
   },
   user: async ({ id }: { id: string }) => {
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id,
       },
     });
+
+    if (!user) return user;
+
+    const result = await combineUserRelations(prisma, user);
+
+    return result;
   },
   profiles: async () => {
-    return await prisma.profile.findMany();
+    const result = await prisma.profile.findMany();
+
+    return result;
   },
   profile: async ({ id }: { id: string }) => {
-    return await prisma.profile.findUnique({
+    const result = await prisma.profile.findUnique({
       where: {
         id,
       },
     });
+
+    return result;
   },
 });
 
@@ -59,10 +124,10 @@ const schema = buildSchema(`
     posts: [Post!]!
     users: [User!]!
     profiles: [Profile!]!
-    memberType(id: MemberTypeId!): MemberType!
-    post(id: UUID!): Post!
-    user(id: UUID!): User!
-    profile(id: UUID!): Profile!
+    memberType(id: MemberTypeId!): MemberType
+    post(id: UUID!): Post
+    user(id: UUID!): User
+    profile(id: UUID!): Profile
   }
 
   type MemberType {
@@ -82,6 +147,8 @@ const schema = buildSchema(`
     id: UUID!
     name: String
     balance: Float
+    profile: Profile
+    posts: [Post]
   }
 
   type Profile {
@@ -90,6 +157,7 @@ const schema = buildSchema(`
     yearOfBirth: Int
     userId: UUID
     memberTypeId: MemberTypeId
+    memberType: MemberType
   }
 `);
 
