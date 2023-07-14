@@ -38,12 +38,78 @@ const combineUserRelations = async (
     },
   });
 
+  const userSubscribedTo = (
+    await prisma.user.findMany({
+      where: {
+        NOT: {
+          id: user.id,
+        },
+        subscribedToUser: {
+          some: {
+            subscriberId: user.id,
+          },
+        },
+      },
+    })
+  ).map(async (user) => {
+    const result = await prisma.user.findMany({
+      where: {
+        NOT: {
+          id: user.id,
+        },
+        userSubscribedTo: {
+          some: {
+            authorId: user.id,
+          },
+        },
+      },
+    });
+
+    Object.assign(user, { subscribedToUser: result });
+
+    return user;
+  });
+
+  const subscribedToUser = (
+    await prisma.user.findMany({
+      where: {
+        NOT: {
+          id: user.id,
+        },
+        userSubscribedTo: {
+          some: {
+            authorId: user.id,
+          },
+        },
+      },
+    })
+  ).map(async (user) => {
+    const result = await prisma.user.findMany({
+      where: {
+        NOT: {
+          id: user.id,
+        },
+        subscribedToUser: {
+          some: {
+            subscriberId: user.id,
+          },
+        },
+      },
+    });
+
+    Object.assign(user, { userSubscribedTo: result });
+
+    return user;
+  });
+
   if (profile) {
     Object.assign(profile, { memberType });
   }
 
   Object.assign(user, { posts });
   Object.assign(user, { profile });
+  Object.assign(user, { userSubscribedTo });
+  Object.assign(user, { subscribedToUser });
 
   return user;
 };
@@ -149,6 +215,8 @@ const schema = buildSchema(`
     balance: Float
     profile: Profile
     posts: [Post]
+    userSubscribedTo: [User]
+    subscribedToUser: [User]
   }
 
   type Profile {
