@@ -1,4 +1,5 @@
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { FastifyInstance } from 'fastify';
 import {
   GraphQLObjectType,
   GraphQLNonNull,
@@ -6,13 +7,15 @@ import {
   GraphQLFloat,
   GraphQLList,
 } from 'graphql';
+import { userPostsResolver } from '../resolvers/userPosts.js';
+import { userProfileResolver } from '../resolvers/userProfile.js';
+import { userSubscribedToUserResolver } from '../resolvers/userSubscribedToUser.js';
+import { userUserSubscribedToResolver } from '../resolvers/userUserSubscribedTo.js';
 import { UUIDType } from '../scalarTypes/uuid.js';
-import { EmptyArgs } from '../tsTypes/types.js';
 import { PostType } from './post.js';
 import { ProfileType } from './profile.js';
 
-// update any
-export const UserType: GraphQLObjectType<any, any> = new GraphQLObjectType({
+export const UserType: GraphQLObjectType<User, FastifyInstance> = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
     id: {
@@ -26,65 +29,19 @@ export const UserType: GraphQLObjectType<any, any> = new GraphQLObjectType({
     },
     profile: {
       type: ProfileType,
-      resolve: (source: User, _args: EmptyArgs, context: { prisma: PrismaClient }) => {
-        const result = context.prisma.profile.findUnique({
-          where: {
-            userId: source.id,
-          },
-        });
-
-        return result;
-      },
+      resolve: userProfileResolver,
     },
     posts: {
-      type: new GraphQLList(PostType),
-      resolve: (source: User, _args: EmptyArgs, context: { prisma: PrismaClient }) => {
-        const result = context.prisma.post.findMany({
-          where: {
-            authorId: source.id,
-          },
-        });
-
-        return result;
-      },
+      type: new GraphQLNonNull(new GraphQLList(PostType)),
+      resolve: userPostsResolver,
     },
     userSubscribedTo: {
-      type: new GraphQLList(UserType),
-      resolve: (source: User, _args: EmptyArgs, context: { prisma: PrismaClient }) => {
-        const result = context.prisma.user.findMany({
-          where: {
-            NOT: {
-              id: source.id,
-            },
-            subscribedToUser: {
-              some: {
-                subscriberId: source.id,
-              },
-            },
-          },
-        });
-
-        return result;
-      },
+      type: new GraphQLNonNull(new GraphQLList(UserType)),
+      resolve: userUserSubscribedToResolver,
     },
     subscribedToUser: {
-      type: new GraphQLList(UserType),
-      resolve: (source: User, _args: EmptyArgs, context: { prisma: PrismaClient }) => {
-        const result = context.prisma.user.findMany({
-          where: {
-            NOT: {
-              id: source.id,
-            },
-            userSubscribedTo: {
-              some: {
-                authorId: source.id,
-              },
-            },
-          },
-        });
-
-        return result;
-      },
+      type: new GraphQLNonNull(new GraphQLList(UserType)),
+      resolve: userSubscribedToUserResolver,
     },
   }),
 });

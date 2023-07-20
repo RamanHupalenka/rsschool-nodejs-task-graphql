@@ -6,7 +6,7 @@ type ProfilesResolver = (
   source: EmptySource,
   args: EmptyArgs,
   context: FastifyInstance,
-) => Promise<Profile[] | null>;
+) => Promise<Profile[]>;
 
 export const profilesResolver: ProfilesResolver = async (_source, _args, { prisma }) => {
   const result = await prisma.profile.findMany();

@@ -6,7 +6,7 @@ type MemberTypesResolver = (
   source: EmptySource,
   args: EmptyArgs,
   context: FastifyInstance,
-) => Promise<MemberType[] | null>;
+) => Promise<MemberType[]>;
 
 export const memberTypesResolver: MemberTypesResolver = async (
   _source,

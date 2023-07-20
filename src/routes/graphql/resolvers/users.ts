@@ -6,7 +6,7 @@ type UsersResolver = (
   source: EmptySource,
   args: EmptyArgs,
   context: FastifyInstance,
-) => Promise<User[] | null>;
+) => Promise<User[]>;
 
 export const usersResolver: UsersResolver = async (_source, _args, { prisma }) => {
   const result = await prisma.user.findMany();

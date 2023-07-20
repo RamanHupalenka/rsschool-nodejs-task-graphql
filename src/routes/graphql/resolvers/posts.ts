@@ -6,7 +6,7 @@ type PostsResolver = (
   source: EmptySource,
   args: EmptyArgs,
   context: FastifyInstance,
-) => Promise<Post[] | null>;
+) => Promise<Post[]>;
 
 export const postsResolver: PostsResolver = async (_source, _args, { prisma }) => {
   const result = await prisma.post.findMany();
