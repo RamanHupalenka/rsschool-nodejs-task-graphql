@@ -1,6 +1,5 @@
 import { User } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptySource } from '../tsTypes/types.js';
+import { EmptySource, GraphQLContext } from '../tsTypes/main.js';
 
 export interface UserArgs {
   id: string;
@@ -9,15 +8,11 @@ export interface UserArgs {
 type UserResolver = (
   source: EmptySource,
   args: UserArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<User | null>;
 
-export const userResolver: UserResolver = async (_source, { id }, { prisma }) => {
-  const result = await prisma.user.findUnique({
-    where: {
-      id,
-    },
-  });
+export const userResolver: UserResolver = async (_source, { id }, { usersLoader }) => {
+  const result = await usersLoader.load(id);
 
   return result;
 };

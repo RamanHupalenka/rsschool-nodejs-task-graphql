@@ -1,13 +1,12 @@
-import { FastifyInstance } from 'fastify';
 import { GraphQLFieldConfig, GraphQLNonNull } from 'graphql';
-import { EmptySource } from '../tsTypes/types.js';
+import { EmptySource, GraphQLContext } from '../tsTypes/main.js';
 import { MemberTypeArgs, memberTypeResolver } from '../resolvers/memberType.js';
 import { MemberTypeType } from '../objectTypes/memberType.js';
 import { MemberTypeIdType } from '../scalarTypes/memberTypeId.js';
 
 export const memberTypeField: GraphQLFieldConfig<
   EmptySource,
-  FastifyInstance,
+  GraphQLContext,
   MemberTypeArgs
 > = {
   type: MemberTypeType,

@@ -1,23 +1,18 @@
 import { Profile, User } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptyArgs } from '../tsTypes/types.js';
+import { EmptyArgs, GraphQLContext } from '../tsTypes/main.js';
 
 type UserProfileResolver = (
   source: User,
   args: EmptyArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<Profile | null>;
 
 export const userProfileResolver: UserProfileResolver = async (
   { id },
   _args,
-  { prisma },
+  { profilesLoader },
 ) => {
-  const result = await prisma.profile.findUnique({
-    where: {
-      userId: id,
-    },
-  });
+  const result = await profilesLoader.load(id);
 
   return result;
 };

@@ -1,9 +1,9 @@
 import { Post } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString } from 'graphql';
 import { UUIDType } from '../scalarTypes/uuid.js';
+import { GraphQLContext } from '../tsTypes/main.js';
 
-export const PostType: GraphQLObjectType<Post, FastifyInstance> = new GraphQLObjectType({
+export const PostType: GraphQLObjectType<Post, GraphQLContext> = new GraphQLObjectType({
   name: 'Post',
   fields: () => ({
     id: {

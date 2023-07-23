@@ -1,19 +1,18 @@
 import { Post, User } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptyArgs } from '../tsTypes/types.js';
+import { EmptyArgs, GraphQLContext } from '../tsTypes/main.js';
 
 type UserPostsResolver = (
   source: User,
   args: EmptyArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<Post[]>;
 
-export const userPostsResolver: UserPostsResolver = async ({ id }, _args, { prisma }) => {
-  const result = await prisma.post.findMany({
-    where: {
-      authorId: id,
-    },
-  });
+export const userPostsResolver: UserPostsResolver = async (
+  { id },
+  _args,
+  { postsLoader },
+) => {
+  const result = await postsLoader.load(id);
 
   return result;
 };

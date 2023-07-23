@@ -1,6 +1,5 @@
 import { Profile } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptySource } from '../tsTypes/types.js';
+import { EmptySource, GraphQLContext } from '../tsTypes/main.js';
 
 export interface ProfileArgs {
   id: string;
@@ -9,7 +8,7 @@ export interface ProfileArgs {
 type ProfileResolver = (
   source: EmptySource,
   args: ProfileArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<Profile | null>;
 
 export const profileResolver: ProfileResolver = async (_source, { id }, { prisma }) => {

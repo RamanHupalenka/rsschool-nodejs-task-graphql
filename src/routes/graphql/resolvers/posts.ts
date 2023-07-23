@@ -1,11 +1,10 @@
 import { Post } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptySource, EmptyArgs } from '../tsTypes/types.js';
+import { EmptySource, EmptyArgs, GraphQLContext } from '../tsTypes/main.js';
 
 type PostsResolver = (
   source: EmptySource,
   args: EmptyArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<Post[]>;
 
 export const postsResolver: PostsResolver = async (_source, _args, { prisma }) => {

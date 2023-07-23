@@ -1,11 +1,10 @@
 import { MemberType } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptySource, EmptyArgs } from '../tsTypes/types.js';
+import { EmptySource, EmptyArgs, GraphQLContext } from '../tsTypes/main.js';
 
 type MemberTypesResolver = (
   source: EmptySource,
   args: EmptyArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<MemberType[]>;
 
 export const memberTypesResolver: MemberTypesResolver = async (

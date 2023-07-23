@@ -1,23 +1,19 @@
 import { MemberType, Profile } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptyArgs } from '../tsTypes/types.js';
+import { MemberTypeId } from '../../member-types/schemas.js';
+import { EmptyArgs, GraphQLContext } from '../tsTypes/main.js';
 
 type ProfileMemberTypeResolver = (
   source: Profile,
   args: EmptyArgs,
-  context: FastifyInstance,
+  context: GraphQLContext,
 ) => Promise<MemberType | null>;
 
 export const profileMemberTypeResolver: ProfileMemberTypeResolver = async (
   { memberTypeId },
   _args,
-  { prisma },
+  { memberTypesLoader },
 ) => {
-  const result = await prisma.memberType.findUnique({
-    where: {
-      id: memberTypeId,
-    },
-  });
+  const result = await memberTypesLoader.load(memberTypeId as MemberTypeId);
 
   return result;
 };

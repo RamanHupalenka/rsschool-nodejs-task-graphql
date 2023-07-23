@@ -1,30 +1,19 @@
 import { User } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
-import { EmptyArgs } from '../tsTypes/types.js';
+import { EmptyArgs, GraphQLContext, UserWithSubscriptionsInfo } from '../tsTypes/main.js';
 
 type UserUserSubscribedToResolver = (
-  source: User,
+  source: UserWithSubscriptionsInfo,
   args: EmptyArgs,
-  context: FastifyInstance,
-) => Promise<User[]>;
+  context: GraphQLContext,
+) => Promise<(User | Error | null)[]>;
 
 export const userUserSubscribedToResolver: UserUserSubscribedToResolver = async (
-  { id },
+  { userSubscribedTo },
   _args,
-  { prisma },
+  { usersLoader },
 ) => {
-  const result = await prisma.user.findMany({
-    where: {
-      NOT: {
-        id,
-      },
-      subscribedToUser: {
-        some: {
-          subscriberId: id,
-        },
-      },
-    },
-  });
+  const followedUsersIds = userSubscribedTo.map((u) => u.authorId);
+  const result = await usersLoader.loadMany(followedUsersIds);
 
   return result;
 };

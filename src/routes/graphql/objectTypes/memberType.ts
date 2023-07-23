@@ -1,9 +1,9 @@
 import { MemberType } from '@prisma/client';
-import { FastifyInstance } from 'fastify';
 import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLInt } from 'graphql';
 import { MemberTypeIdType } from '../scalarTypes/memberTypeId.js';
+import { GraphQLContext } from '../tsTypes/main.js';
 
-export const MemberTypeType: GraphQLObjectType<MemberType, FastifyInstance> =
+export const MemberTypeType: GraphQLObjectType<MemberType, GraphQLContext> =
   new GraphQLObjectType({
     name: 'MemberType',
     fields: () => ({
