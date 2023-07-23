@@ -1,6 +1,8 @@
 import { Type } from '@fastify/type-provider-typebox';
 import { GraphQLSchema } from 'graphql';
 import { ChangePostInputType } from './inputTypes/changePost.js';
+import { ChangeProfileInputType } from './inputTypes/changeProfile.js';
+import { ChangeUserInputType } from './inputTypes/changeUser.js';
 import { CreatePostInputType } from './inputTypes/createPost.js';
 import { CreateProfileInputType } from './inputTypes/createProfile.js';
 import { CreateUserInputType } from './inputTypes/createUser.js';
@@ -37,6 +39,7 @@ export const graphqlSchema = new GraphQLSchema({
   types: [
     UUIDType,
     MemberTypeIdType,
+    VoidType,
     MemberTypeType,
     PostType,
     ProfileType,
@@ -44,8 +47,9 @@ export const graphqlSchema = new GraphQLSchema({
     CreatePostInputType,
     CreateUserInputType,
     CreateProfileInputType,
-    VoidType,
     ChangePostInputType,
+    ChangeUserInputType,
+    ChangeProfileInputType,
   ],
   query: QueryType,
   mutation: MutationType,
