@@ -1,4 +1,20 @@
 import { Type } from '@fastify/type-provider-typebox';
+import { GraphQLSchema } from 'graphql';
+import { ChangePostInputType } from './inputTypes/changePost.js';
+import { ChangeProfileInputType } from './inputTypes/changeProfile.js';
+import { ChangeUserInputType } from './inputTypes/changeUser.js';
+import { CreatePostInputType } from './inputTypes/createPost.js';
+import { CreateProfileInputType } from './inputTypes/createProfile.js';
+import { CreateUserInputType } from './inputTypes/createUser.js';
+import { MemberTypeType } from './objectTypes/memberType.js';
+import { MutationType } from './objectTypes/mutation.js';
+import { PostType } from './objectTypes/post.js';
+import { ProfileType } from './objectTypes/profile.js';
+import { QueryType } from './objectTypes/query.js';
+import { UserType } from './objectTypes/user.js';
+import { MemberTypeIdType } from './scalarTypes/memberTypeId.js';
+import { UUIDType } from './scalarTypes/uuid.js';
+import { VoidType } from './scalarTypes/void.js';
 
 export const gqlResponseSchema = Type.Partial(
   Type.Object({
@@ -18,3 +34,23 @@ export const createGqlResponseSchema = {
     },
   ),
 };
+
+export const graphqlSchema = new GraphQLSchema({
+  types: [
+    UUIDType,
+    MemberTypeIdType,
+    VoidType,
+    MemberTypeType,
+    PostType,
+    ProfileType,
+    UserType,
+    CreatePostInputType,
+    CreateUserInputType,
+    CreateProfileInputType,
+    ChangePostInputType,
+    ChangeUserInputType,
+    ChangeProfileInputType,
+  ],
+  query: QueryType,
+  mutation: MutationType,
+});

@@ -12,20 +12,21 @@ export const UUIDType = new GraphQLScalarType({
     if (!isUUID(value)) {
       throw new TypeError(`Invalid UUID.`);
     }
+
     return value;
   },
   parseValue(value) {
     if (!isUUID(value)) {
       throw new TypeError(`Invalid UUID.`);
     }
+
     return value;
   },
   parseLiteral(ast) {
-    if (ast.kind === Kind.STRING) {
-      if (isUUID(ast.value)) {
-        return ast.value;
-      }
+    if (ast.kind === Kind.STRING && isUUID(ast.value)) {
+      return ast.value;
     }
+
     return undefined;
   },
 });
